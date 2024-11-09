@@ -4,6 +4,7 @@
 @using FlowerShop.Data
 @using FlowerShop.Models
 @inject UserDbContext _context
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 @page "/register"
 
@@ -67,5 +68,7 @@
 
         _context.Users.Add(user);
         _context.SaveChanges();
+        
+        NavigationManager.NavigateTo($"auth/singin?email={user.Email}&role=user", true);
     }
 }

@@ -4,8 +4,9 @@
 @using FlowerShop.Data
 @using FlowerShop.Models
 @inject UserDbContext _context
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
-@page "/register"
+@page "/login"
 
 <div class="row">
     <div>
@@ -53,9 +54,13 @@
 
             if (findUser != null)
             {
+                if (findUser.Email == "admin")
+                {
+                    NavigationManager.NavigateTo($"Auth/singinAdmin?email={findUser.Email}", true);   
+                }
                 if (findUser.PasswordHash == hash)
                 {
-                    
+                    NavigationManager.NavigateTo($"auth/singin?email={findUser.Email}&role=user", true);
                 }
             }
         }
