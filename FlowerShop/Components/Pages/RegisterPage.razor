@@ -31,6 +31,7 @@
                         <DataAnnotationsValidator/>
                         <ValidationSummary/>
                     </EditForm>
+                    <p>@Message</p>
                 </div>
             </div>
         </section>
@@ -39,9 +40,18 @@
 
 @code {
     private UserViewModel ViewModel { get; set; } = new();
+
+    private string Message;
     
     private void Submit()
     {
+        if (_context.Users.Any(x => x.Email == ViewModel.Email))
+        {
+            Message = "Пользователь с такой почтой уже зарегистрирован";
+            
+            return;
+        }
+        
         User user = new()
         {
             Id = Guid.NewGuid().ToString(),
