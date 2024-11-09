@@ -1,0 +1,71 @@
+﻿@using System.Security.Cryptography
+@using System.Text
+@using FlowerShop.Core
+@using FlowerShop.Data
+@using FlowerShop.Models
+@inject UserDbContext _context
+@rendermode InteractiveServer
+@page "/register"
+
+<div class="row">
+    <div>
+        <section>
+            <div class="col-lg-10 col-xl-9 mx-auto">
+                <div class="cardborder-0 shadow rounded-3 overflow-hidden">
+                    <EditForm Model="@ViewModel" OnValidSubmit="Submit" FormName="register">
+                        <div class="card-body p-4 p-sm-5">
+                            <h5 class="card-title text-center mb-5 fw-light fs-5">Регистрация</h5>
+                            <InputText @bind-Value="ViewModel.FirstName" class="form-control" autocomplete="name" aria-required="true" placeholder="Имя"/>
+
+                            <InputText @bind-Value="ViewModel.LastName" class="form-control" autocomplete="lastname" aria-required="true" placeholder="Фамилия" style="margin-top: 10px;"/>
+
+                            <InputText @bind-Value="ViewModel.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="name@example.com" style="margin-top: 10px;"/>
+
+                            <InputText @bind-Value="ViewModel.Password" class="form-control" autocomplete="password" type="password" aria-required="true" placeholder="Пароль"  style="margin-top: 10px;"/>
+
+                            <div class="d-grid mb-2" style="margin-top: 10px;">
+                                <button Variant="Variant.Filled" class="btn btn-primary" Color="Color.Primary" type="submit">Зарегистрироваться</button>
+                            </div>
+                        </div>
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+                    </EditForm>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+    private UserViewModel ViewModel { get; set; } = new();
+    
+    private void Submit()
+    {
+        User user = new()
+        {
+            Id = Guid.NewGuid().ToString(),
+            FirstName = ViewModel.FirstName,
+            LastName = ViewModel.LastName,
+            Email = ViewModel.Email,
+            UserName = ViewModel.Email,
+        };
+        
+        using (SHA256 sha = SHA256.Create())
+        {
+            byte[] hashValue = sha.ComputeHash(Encoding.UTF8.GetBytes(ViewModel.Password));
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < hashValue.Length; i++)
+            {
+                builder.Append(hashValue[i].ToString("x2")); // Преобразуем байты хэша в шестнадцатеричное представление
+            }
+
+            string hash = builder.ToString();
+
+            user.PasswordHash = hash;
+        }
+
+        _context.Users.Add(user);
+        _context.SaveChanges();
+    }
+}
