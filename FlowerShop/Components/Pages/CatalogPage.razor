@@ -1,0 +1,33 @@
+﻿@inject AppDbContext _context
+@page "/catalog"
+@using FlowerShop.Data
+
+
+
+<div class="container mt-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var item in _context.Flowers)
+        {
+            <Card Class="mb-4" Style="width:18rem; margin-left: 5px;">
+                <img class="rounded-top" src="data:image/png;base64, @item.Image" alt="placeholder"/>
+                <CardBody>
+                    <CardTitle>@item.Name</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
+                    @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
+                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="Callback">Купить</Button>
+                </CardBody>
+            </Card>
+        }
+    </div>
+</div>
+@code {
+    protected override void OnInitialized()
+    {
+        
+    }
+
+    private void Callback()
+    {
+        
+    }
+}

@@ -27,6 +27,7 @@
                             <div class="d-grid mb-2" style="margin-top: 10px;">
                                 <button Variant="Variant.Filled" class="btn btn-primary" Color="Color.Primary" type="submit">Зарегистрироваться</button>
                             </div>
+                            <a href="/login">Уже зарегистрированы на сайте?</a>
                         </div>
                         <DataAnnotationsValidator/>
                         <ValidationSummary/>
@@ -68,17 +69,24 @@
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < hashValue.Length; i++)
             {
-                builder.Append(hashValue[i].ToString("x2")); // Преобразуем байты хэша в шестнадцатеричное представление
+                builder.Append(hashValue[i].ToString("x2"));
             }
 
             string hash = builder.ToString();
 
             user.PasswordHash = hash;
         }
-
+        
         _context.Users.Add(user);
         _context.SaveChanges();
         
-        NavigationManager.NavigateTo($"auth/singin?email={user.Email}&role=user", true);
+        if (user.Email == "admin@gmail.com")
+        {
+            NavigationManager.NavigateTo($"auth/singin?email={user.Email}&role=admin", true);
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"auth/singin?email={user.Email}&role=user", true);
+        }
     }
 }

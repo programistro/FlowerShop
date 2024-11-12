@@ -1,2 +1,140 @@
 ﻿@attribute [Authorize(Roles = "admin")]
+@rendermode InteractiveServer
+@inject AppDbContext _context
+@using BlazorBootstrap
+@using FlowerShop.Core
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using FlowerShop.Data
 @page "/admin"
+
+<QuickGrid Items="@itemsQueryable">
+    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true"/>
+    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true"/>
+    <TemplateColumn Title="Изменить">
+        <button class="btn btn-primary" @onclick="@(() => ChangeFlower(context))">Изменить</button>
+        
+    </TemplateColumn>
+    <TemplateColumn Title="Удалить">
+        <button class="btn btn-primary" @onclick="@(() => DeleteFlower(context))">Удалить</button>
+    </TemplateColumn>
+</QuickGrid>
+
+<Modal @ref="changeModal" title="Изменить" UseStaticBackdrop="true" CloseOnEscape="true">
+    <BodyTemplate>
+        <input type="text" @bind-value="_name" class="form-control dark-theme-textbox" autocomplete="off" placeholder="Название">
+
+        <input type="text" @bind-value="_price" class="form-control dark-theme-textbox" autocomplete="off" placeholder="Цена" style="margin-top: 5px;">
+
+        <InputFile OnChange="@HandleFileSelected" accept=".jpg,.png" style="margin-top: 5px;"/>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnChange">Изменить</Button>
+    </FooterTemplate>
+</Modal>
+
+<Modal @ref="addFlower" title="Добавить цветок" UseStaticBackdrop="true" CloseOnEscape="true">
+    <BodyTemplate>
+        <input type="text" @bind-value="_newNameFlower" class="form-control dark-theme-textbox" autocomplete="off" placeholder="Название">
+        
+        <input type="text" @bind-value="_newPrice" class="form-control dark-theme-textbox" autocomplete="off" placeholder="Цена" style="margin-top: 5px;">
+        
+        @* <input type="text" @bind-value="_newImage" class="form-control dark-theme-textbox" autocomplete="off" placeholder="Изображение" style="margin-top: 5px;"> *@
+        <InputFile OnChange="@HandleFileSelected" accept=".jpg,.png" style="margin-top: 5px;"/>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="AddFlower">Добавить</Button>
+    </FooterTemplate>
+</Modal>
+
+<button class="btn btn-primary" @onclick="CreateFlower">Добавить цветок</button>
+
+@code {
+    protected IQueryable<Flower>? itemsQueryable;
+
+    private Modal changeModal = default!;
+    
+    private Modal addFlower = default!;
+
+    private double _price;
+
+    private double _newPrice;
+    
+    private string _image;
+    
+    private string _name;
+
+    private string _newNameFlower;
+
+    private string _newImage;
+    
+    private Flower selectedFlower;
+    
+    protected override void OnInitialized()
+    {
+        var items = _context.Flowers;
+
+        itemsQueryable = items.AsQueryable();
+    }
+
+    private async Task OnChange()
+    {
+        await Task.Run(() =>
+        {
+            selectedFlower.Name = _name;
+            selectedFlower.Image = _image;
+            selectedFlower.Price = _price;
+            _context.Flowers.Update(selectedFlower);
+            _context.SaveChangesAsync();
+        });
+        await changeModal.HideAsync();
+    }
+
+    private async Task ChangeFlower(Flower flower)
+    {
+        selectedFlower = flower;
+        _name = selectedFlower.Name;
+        _price = selectedFlower.Price;
+        await changeModal.ShowAsync();
+    }
+
+    private async void CreateFlower(MouseEventArgs obj)
+    {
+        await addFlower.ShowAsync();
+    }
+
+    private async Task AddFlower()
+    {
+        await Task.Run(() =>
+        {
+            Flower flower = new()
+            {
+                Id = Guid.NewGuid(),
+                Name = _newNameFlower,
+                Image = _newImage,
+                Price = _newPrice
+            };
+            _context.Flowers.AddAsync(flower);
+            _context.SaveChangesAsync();
+        });
+        await addFlower.HideAsync();
+        
+        StateHasChanged();
+    }
+
+    private void DeleteFlower(Flower flower)
+    {
+        _context.Flowers.Remove(flower);
+        _context.SaveChanges();
+    }
+
+    private async void HandleFileSelected(InputFileChangeEventArgs obj)
+    {
+        var buffer = new byte[obj.File.Size];
+        using (var ms = new MemoryStream(buffer))
+        {
+            await obj.File.OpenReadStream().CopyToAsync(ms);
+            _image = Convert.ToBase64String(buffer);
+            _newImage = Convert.ToBase64String(buffer);
+        }
+    }
+}

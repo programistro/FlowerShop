@@ -10,8 +10,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddAuthentication().AddIdentityCookies();
 builder.Services.AddControllers();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContextFactory<UserDbContext>();
+builder.Services.AddBlazorBootstrap();
+builder.Services.AddDbContextFactory<AppDbContext>();
+builder.Services.AddQuickGridEntityFrameworkAdapter();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
 

@@ -23,6 +23,7 @@
                             <div class="d-grid mb-2" style="margin-top: 10px;">
                                 <button Variant="Variant.Filled" class="btn btn-primary" Color="Color.Primary" type="submit">Войти</button>
                             </div>
+                            <a href="/register">Не зарегистрированы на сайте?</a>
                         </div>
                         <DataAnnotationsValidator/>
                         <ValidationSummary/>
@@ -52,9 +53,9 @@
 
             var findUser = _context.Users.FirstOrDefault(x => x.Email == ViewModel.Email);
 
-            if (ViewModel.Email == "admin")
+            if (ViewModel.Email == "admin@gmail.com")
             {
-                NavigationManager.NavigateTo($"Auth/singinAdmin?email={ViewModel.Email}", true);   
+                NavigationManager.NavigateTo($"auth/singin?email={findUser.Email}&role=admin", true);
             }
             
             if (findUser != null)
