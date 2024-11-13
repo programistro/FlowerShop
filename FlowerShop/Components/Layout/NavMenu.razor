@@ -63,7 +63,7 @@
             {
                 Role = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-                UserService.User = User;
+                UserService.UserId = User.Id;
             }
         }
     }

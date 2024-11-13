@@ -18,7 +18,7 @@
                     <CardTitle>@item.Name</CardTitle>
                     <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
                     @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
-                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddFlowerCart(item))">Добавить в корзину</Button>
+                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddFlowerCart(item.Id))">Добавить в корзину</Button>
                 </CardBody>
             </Card>
         }
@@ -27,12 +27,12 @@
 
 <Modal @ref="cartModal" title="Корзина" UseStaticBackdrop="true" CloseOnEscape="true">
     <BodyTemplate>
-        @foreach (var item in UserService.User.ShopFlowers)
+        @foreach (var item in _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopFlowers)
         {
             var flower = _context.Flowers.FirstOrDefault(x => x.Id == item);
             <div style="display: flex;">
                 <p>@flower.Name @flower.Price рублей</p>
-                <button class="btn btn-primary" style="margin-left: 10px;" @onclick="@(() => RemoveFlower(flower))">Удалить</button>
+                <button class="btn btn-primary" style="margin-left: 10px;" @onclick="@(() => RemoveFlower(flower.Id))">Удалить</button>
             </div>
         }
     </BodyTemplate>
@@ -56,16 +56,18 @@
         }
     }
 
-    private void AddFlowerCart(Flower flower)
+    private void AddFlowerCart(Guid flower)
     {
-        UserService.User.ShopFlowers.Add(flower.Id);
-        _userContext.Users.Update(UserService.User);
+        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
+        
+        findUser.ShopFlowers.Add(flower);
+        _userContext.Users.Update(findUser);
         _userContext.SaveChanges();
     }
 
     private async void BuyFlower()
     {
-        var findUser = UserService.User;
+        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
         
         double amount = 0;
 
@@ -82,11 +84,11 @@
         await cartModal.HideAsync();
     }
 
-    private void RemoveFlower(Flower flower)
+    private void RemoveFlower(Guid flower)
     {
-        var findUser = UserService.User;
+        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
         
-        findUser.ShopFlowers.Remove(flower.Id);
+        findUser.ShopFlowers.Remove(flower);
         _userContext.Users.Update(findUser);
         _userContext.SaveChanges();
     }
