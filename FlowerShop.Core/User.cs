@@ -12,5 +12,5 @@ public class User : IdentityUser
     
     public string LastName { get; set; }
 
-    public List<Flower> ShopFlowers { get; set; } = new List<Flower>();
+    public List<Guid> ShopFlowers { get; set; } = new List<Guid>();
 }

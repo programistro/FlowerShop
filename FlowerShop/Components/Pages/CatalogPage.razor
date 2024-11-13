@@ -1,4 +1,5 @@
-﻿@inject AppDbContext _context
+﻿@attribute [Authorize]
+@inject AppDbContext _context
 @inject UserDbContext _userContext
 @inject UserService UserService
 @rendermode InteractiveServer
@@ -26,7 +27,14 @@
 
 <Modal @ref="cartModal" title="Корзина" UseStaticBackdrop="true" CloseOnEscape="true">
     <BodyTemplate>
-        
+        @foreach (var item in UserService.User.ShopFlowers)
+        {
+            var flower = _context.Flowers.FirstOrDefault(x => x.Id == item);
+            <div style="display: flex;">
+                <p>@flower.Name @flower.Price рублей</p>
+                <button class="btn btn-primary" style="margin-left: 10px;" @onclick="@(() => RemoveFlower(flower))">Удалить</button>
+            </div>
+        }
     </BodyTemplate>
     <FooterTemplate>
         <Button Color="ButtonColor.Secondary" @onclick="BuyFlower">Купить</Button>
@@ -34,28 +42,52 @@
 </Modal>
 
 @code {
-    [Parameter] public bool ShowCard { get; set; } = false;
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public bool? ShowCard { get; set; } = false;
     
     private Modal cartModal = default!;
-    
-    protected override void OnInitialized()
+
+    protected override async void OnAfterRender(bool firstRender)
     {
-        if (ShowCard)
+        if (ShowCard == true)
         {
-            
+            await cartModal.ShowAsync();
         }
     }
 
     private void AddFlowerCart(Flower flower)
     {
-        UserService.User.ShopFlowers.Add(flower);
-
+        UserService.User.ShopFlowers.Add(flower.Id);
         _userContext.Users.Update(UserService.User);
         _userContext.SaveChanges();
     }
 
-    private void BuyFlower()
+    private async void BuyFlower()
     {
+        var findUser = UserService.User;
         
+        double amount = 0;
+
+        foreach (var item in findUser.ShopFlowers)
+        {
+            amount += _context.Flowers.FirstOrDefault(x => x.Id == item).Price;
+        }
+
+        findUser.Balance -= amount;
+        findUser.ShopFlowers.Clear();
+        _userContext.Users.Update(findUser);
+        _userContext.SaveChanges();
+
+        await cartModal.HideAsync();
+    }
+
+    private void RemoveFlower(Flower flower)
+    {
+        var findUser = UserService.User;
+        
+        findUser.ShopFlowers.Remove(flower.Id);
+        _userContext.Users.Update(findUser);
+        _userContext.SaveChanges();
     }
 }
