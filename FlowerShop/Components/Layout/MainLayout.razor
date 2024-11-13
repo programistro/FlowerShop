@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@using FlowerShop.Service
+@inherits LayoutComponentBase
+@inject UserService UserService
 
 <div class="page">
     <div class="sidebar">
@@ -11,6 +13,8 @@
             <AuthorizeView>
                 <Authorized>
                     <a href="auth/signout">@context.User.Identity.Name</a>
+                    
+                    <a href="/catalog?showCard=true">Корзина @UserService.User.ShopFlowers.Count</a>
                 </Authorized>
                 <NotAuthorized>
                     <a href="/register">Регитсрация</a>

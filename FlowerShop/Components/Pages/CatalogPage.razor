@@ -1,8 +1,11 @@
 ﻿@inject AppDbContext _context
+@inject UserDbContext _userContext
+@inject UserService UserService
+@rendermode InteractiveServer
 @page "/catalog"
+@using FlowerShop.Core
 @using FlowerShop.Data
-
-
+@using FlowerShop.Service
 
 <div class="container mt-4">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
@@ -14,19 +17,44 @@
                     <CardTitle>@item.Name</CardTitle>
                     <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
                     @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
-                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="Callback">Купить</Button>
+                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddFlowerCart(item))">Добавить в корзину</Button>
                 </CardBody>
             </Card>
         }
     </div>
 </div>
+
+<Modal @ref="cartModal" title="Корзина" UseStaticBackdrop="true" CloseOnEscape="true">
+    <BodyTemplate>
+        
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="BuyFlower">Купить</Button>
+    </FooterTemplate>
+</Modal>
+
 @code {
+    [Parameter] public bool ShowCard { get; set; } = false;
+    
+    private Modal cartModal = default!;
+    
     protected override void OnInitialized()
     {
-        
+        if (ShowCard)
+        {
+            
+        }
     }
 
-    private void Callback()
+    private void AddFlowerCart(Flower flower)
+    {
+        UserService.User.ShopFlowers.Add(flower);
+
+        _userContext.Users.Update(UserService.User);
+        _userContext.SaveChanges();
+    }
+
+    private void BuyFlower()
     {
         
     }

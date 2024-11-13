@@ -1,6 +1,7 @@
 ﻿@attribute [Authorize(Roles = "admin")]
 @rendermode InteractiveServer
 @inject AppDbContext _context
+@inject UserDbContext _userContext
 @using BlazorBootstrap
 @using FlowerShop.Core
 @using Microsoft.AspNetCore.Components.QuickGrid
@@ -48,12 +49,38 @@
 
 <button class="btn btn-primary" @onclick="CreateFlower">Добавить цветок</button>
 
+<QuickGrid Items="@_usersQueryable" Style="margin-top: 10px;">
+    <PropertyColumn Property="@(user => user.Email)" Sortable="true"/>
+    <PropertyColumn Property="@(user => user.Balance)" Sortable="true"/>
+    <PropertyColumn Property="@(user => user.FirstName)" Sortable="true"/>
+    <PropertyColumn Property="@(user => user.LastName)" Sortable="true"/>
+    <TemplateColumn Title="Добавить баланс">
+        <button class="btn btn-primary" @onclick="@(() => ShowChangeBalance(context))">Изменить</button>
+    </TemplateColumn>
+</QuickGrid>
+
+<Modal @ref="userModal" title="Изменить баланс пользователю" UseStaticBackdrop="true" CloseOnEscape="true">
+    <BodyTemplate>
+        <input type="text" @bind-value="_balance" class="form-control dark-theme-textbox" autocomplete="off" 
+               placeholder="Баланс" style="margin-top: 5px;">
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="ChangeBalance">Изменить</Button>
+    </FooterTemplate>
+</Modal>
+
 @code {
     protected IQueryable<Flower>? itemsQueryable;
+
+    protected IQueryable<User>? _usersQueryable;
 
     private Modal changeModal = default!;
     
     private Modal addFlower = default!;
+    
+    private Modal userModal = default!;
+
+    private User selectedUser;
 
     private double _price;
 
@@ -68,12 +95,14 @@
     private string _newImage;
     
     private Flower selectedFlower;
+
+    private double _balance;
     
     protected override void OnInitialized()
     {
-        var items = _context.Flowers;
+        itemsQueryable = _context.Flowers.AsQueryable();
 
-        itemsQueryable = items.AsQueryable();
+        _usersQueryable = _userContext.Users.AsQueryable();
     }
 
     private async Task OnChange()
@@ -136,5 +165,25 @@
             _image = Convert.ToBase64String(buffer);
             _newImage = Convert.ToBase64String(buffer);
         }
+    }
+
+    private async Task ChangeBalance()
+    {
+        await Task.Run(() =>
+        {
+            selectedUser.Balance = _balance;
+            _userContext.Users.Update(selectedUser);
+            _context.SaveChangesAsync();
+        });
+        await userModal.HideAsync();
+        
+        StateHasChanged();
+    }
+
+    private async void ShowChangeBalance(User user)
+    {
+        selectedUser = user;
+
+        await userModal.ShowAsync();
     }
 }

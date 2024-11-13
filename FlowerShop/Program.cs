@@ -1,5 +1,6 @@
 using FlowerShop.Components;
 using FlowerShop.Data;
+using FlowerShop.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContextFactory<UserDbContext>();
 builder.Services.AddBlazorBootstrap();
+builder.Services.AddSingleton<UserService>();
 builder.Services.AddDbContextFactory<AppDbContext>();
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
