@@ -22,6 +22,30 @@
                 </CardBody>
             </Card>
         }
+        @foreach (var item in _context.Toys)
+        {
+            <Card Class="mb-4" Style="width:18rem; margin-left: 5px;">
+                <img class="rounded-top" src="data:image/png;base64, @item.Image" alt="placeholder"/>
+                <CardBody>
+                    <CardTitle>@item.Name</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
+                    @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
+                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddFlowerCart(item.Id))">Добавить в корзину</Button>
+                </CardBody>
+            </Card>
+        }
+        @foreach (var item in _context.Packs)
+        {
+            <Card Class="mb-4" Style="width:18rem; margin-left: 5px;">
+                <img class="rounded-top" src="data:image/png;base64, @item.Image" alt="placeholder"/>
+                <CardBody>
+                    <CardTitle>@item.Name</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
+                    @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
+                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddFlowerCart(item.Id))">Добавить в корзину</Button>
+                </CardBody>
+            </Card>
+        }
     </div>
 </div>
 
@@ -45,6 +69,8 @@
     [Parameter]
     [SupplyParameterFromQuery]
     public bool? ShowCard { get; set; } = false;
+
+    private double fullPrice;
     
     private Modal cartModal = default!;
 
@@ -52,6 +78,16 @@
     {
         if (ShowCard == true)
         {
+            foreach (var item in _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopFlowers)
+            {
+                var flower = _context.Flowers.FirstOrDefault(x => x.Id == item);
+
+                if (flower != null)
+                {
+                    fullPrice += flower.Price;
+                }
+            }
+            
             await cartModal.ShowAsync();
             ShowCard = false;
         }

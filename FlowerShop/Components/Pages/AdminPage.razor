@@ -8,15 +8,42 @@
 @using FlowerShop.Data
 @page "/admin"
 
-<QuickGrid Items="@itemsQueryable">
+<h2>Цветы</h2>
+<QuickGrid Items="@_context.Flowers">
     <PropertyColumn Property="@(flower => flower.Name)" Sortable="true"/>
     <PropertyColumn Property="@(flower => flower.Price)" Sortable="true"/>
     <TemplateColumn Title="Изменить">
-        <button class="btn btn-primary" @onclick="@(() => ChangeFlower(context))">Изменить</button>
+        <button class="btn btn-primary" @onclick="@(() => ChangeModel(context))">Изменить</button>
         
     </TemplateColumn>
     <TemplateColumn Title="Удалить">
-        <button class="btn btn-primary" @onclick="@(() => DeleteFlower(context))">Удалить</button>
+        <button class="btn btn-primary" @onclick="@(() => DeleteModel(context))">Удалить</button>
+    </TemplateColumn>
+</QuickGrid>
+
+<h2>Упаковки</h2>
+<QuickGrid Items="@_context.Packs">
+    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true"/>
+    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true"/>
+    <TemplateColumn Title="Изменить">
+        <button class="btn btn-primary" @onclick="@(() => ChangeModel(context))">Изменить</button>
+
+    </TemplateColumn>
+    <TemplateColumn Title="Удалить">
+        <button class="btn btn-primary" @onclick="@(() => DeleteModel(context))">Удалить</button>
+    </TemplateColumn>
+</QuickGrid>
+
+<h2>Игрушки</h2>
+<QuickGrid Items="@_context.Toys">
+    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true"/>
+    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true"/>
+    <TemplateColumn Title="Изменить">
+        <button class="btn btn-primary" @onclick="@(() => ChangeModel(context))">Изменить</button>
+
+    </TemplateColumn>
+    <TemplateColumn Title="Удалить">
+        <button class="btn btn-primary" @onclick="@(() => DeleteModel(context))">Удалить</button>
     </TemplateColumn>
 </QuickGrid>
 
@@ -33,23 +60,33 @@
     </FooterTemplate>
 </Modal>
 
-<Modal @ref="addFlower" title="Добавить цветок" UseStaticBackdrop="true" CloseOnEscape="true">
+<Modal @ref="addModel" title="Добавить" UseStaticBackdrop="true" CloseOnEscape="true">
     <BodyTemplate>
         <input type="text" @bind-value="_newNameFlower" class="form-control dark-theme-textbox" autocomplete="off" placeholder="Название">
         
         <input type="text" @bind-value="_newPrice" class="form-control dark-theme-textbox" autocomplete="off" placeholder="Цена" style="margin-top: 5px;">
+
+        <select @bind="_model">
+            <option>-</option>
+            <option value="flower">Цветок</option>
+            <option value="toy">Игрушка</option>
+            <option value="pack">Упаковка</option>
+        </select>
         
-        @* <input type="text" @bind-value="_newImage" class="form-control dark-theme-textbox" autocomplete="off" placeholder="Изображение" style="margin-top: 5px;"> *@
         <InputFile OnChange="@HandleFileSelected" accept=".jpg,.png" style="margin-top: 5px;"/>
     </BodyTemplate>
     <FooterTemplate>
-        <Button Color="ButtonColor.Secondary" @onclick="AddFlower">Добавить</Button>
+        <Button Color="ButtonColor.Secondary" @onclick="AddModel">Добавить</Button>
     </FooterTemplate>
 </Modal>
 
 <button class="btn btn-primary" @onclick="CreateFlower">Добавить цветок</button>
 
-<QuickGrid Items="@_usersQueryable" Style="margin-top: 10px;">
+<button class="btn btn-primary" @onclick="CreateToy" style="margin-top: 10px;">Добавить Упаковку</button>
+
+<button class="btn btn-primary" @onclick="CreatePack" style="margin-top: 10px;">Добавить Игрушку</button>
+
+<QuickGrid Items="@_userContext.Users" Style="margin-top: 10px;">
     <PropertyColumn Property="@(user => user.Email)" Sortable="true"/>
     <PropertyColumn Property="@(user => user.Balance)" Sortable="true"/>
     <PropertyColumn Property="@(user => user.FirstName)" Sortable="true"/>
@@ -76,7 +113,7 @@
 
     private Modal changeModal = default!;
     
-    private Modal addFlower = default!;
+    private Modal addModel = default!;
     
     private Modal userModal = default!;
 
@@ -94,65 +131,126 @@
 
     private string _newImage;
     
-    private Flower selectedFlower;
+    private IEntity selectedEntity;
+
+    private bool _isFlower = true;
+    
+    private bool _isToy = false;
+    
+    private bool _isPack = false;
+
+    private string _model;
 
     private double _balance;
-    
-    protected override void OnInitialized()
-    {
-        itemsQueryable = _context.Flowers.AsQueryable();
-
-        _usersQueryable = _userContext.Users.AsQueryable();
-    }
 
     private async Task OnChange()
     {
         await Task.Run(() =>
         {
-            selectedFlower.Name = _name;
-            selectedFlower.Image = _image;
-            selectedFlower.Price = _price;
-            _context.Flowers.Update(selectedFlower);
+            // todo проверка на Null and empty string 
+            selectedEntity.Name = _name;
+            selectedEntity.Image = _image;
+            selectedEntity.Price = _price;
+
+            if (selectedEntity.GetType() == typeof(Flower))
+            {
+                _context.Flowers.Update(selectedEntity as Flower);
+            }
+            else if (selectedEntity.GetType() == typeof(Toy))
+            {
+                _context.Toys.Update(selectedEntity as Toy);
+            }
+            else if (selectedEntity.GetType() == typeof(Pack))
+            {
+                _context.Packs.Update(selectedEntity as Pack);
+            }
+            
             _context.SaveChangesAsync();
         });
         await changeModal.HideAsync();
     }
 
-    private async Task ChangeFlower(Flower flower)
+    private async Task ChangeModel<T>(T model) where T : IEntity
     {
-        selectedFlower = flower;
-        _name = selectedFlower.Name;
-        _price = selectedFlower.Price;
+        selectedEntity = model;
+        _name = selectedEntity.Name;
+        _price = selectedEntity.Price;
         await changeModal.ShowAsync();
     }
 
     private async void CreateFlower(MouseEventArgs obj)
     {
-        await addFlower.ShowAsync();
+        await addModel.ShowAsync();
+    }
+    
+    private async void CreatePack(MouseEventArgs obj)
+    {
+        await addModel.ShowAsync();
+    }
+    
+    private async void CreateToy(MouseEventArgs obj)
+    {
+        await addModel.ShowAsync();
     }
 
-    private async Task AddFlower()
+    private async Task AddModel()
     {
         await Task.Run(() =>
         {
-            Flower flower = new()
+            if (_model == "flower")
             {
-                Id = Guid.NewGuid(),
-                Name = _newNameFlower,
-                Image = _newImage,
-                Price = _newPrice
-            };
-            _context.Flowers.AddAsync(flower);
+                Flower flower = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = _newNameFlower,
+                    Image = _newImage,
+                    Price = _newPrice
+                };
+                _context.Flowers.AddAsync(flower);    
+            }
+            else if (_model == "pack")
+            {
+                Pack pack = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = _newNameFlower,
+                    Image = _newImage,
+                    Price = _newPrice
+                };
+                _context.Packs.AddAsync(pack);    
+            }
+            else if (_model == "toy")
+            {
+                Toy toy = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = _newNameFlower,
+                    Image = _newImage,
+                    Price = _newPrice
+                };
+                _context.Toys.AddAsync(toy);
+            }
+            
             _context.SaveChangesAsync();
         });
-        await addFlower.HideAsync();
-        
-        StateHasChanged();
+        await addModel.HideAsync();
     }
 
-    private void DeleteFlower(Flower flower)
+    private void DeleteModel<T>(T model) where T : IEntity
     {
-        _context.Flowers.Remove(flower);
+        if (model.GetType() == typeof(Flower))
+        {
+            _context.Flowers.Remove(model as Flower);    
+        }
+        if (model.GetType() == typeof(Pack))
+        {
+            _context.Packs.Remove(model as Pack);
+        }
+        if (model.GetType() == typeof(Toy))
+        {
+            _context.Toys.Remove(model as Toy);
+        }
+        
         _context.SaveChanges();
     }
 
@@ -161,7 +259,7 @@
         var buffer = new byte[obj.File.Size];
         using (var ms = new MemoryStream(buffer))
         {
-            await obj.File.OpenReadStream().CopyToAsync(ms);
+            await obj.File.OpenReadStream(202428800).CopyToAsync(ms);
             _image = Convert.ToBase64String(buffer);
             _newImage = Convert.ToBase64String(buffer);
         }
@@ -176,8 +274,6 @@
             _context.SaveChangesAsync();
         });
         await userModal.HideAsync();
-        
-        StateHasChanged();
     }
 
     private async void ShowChangeBalance(User user)
