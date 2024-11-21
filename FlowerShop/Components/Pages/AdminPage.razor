@@ -6,6 +6,7 @@
 @using FlowerShop.Core
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using FlowerShop.Data
+@using Microsoft.EntityFrameworkCore
 @page "/admin"
 
 <h2>Цветы</h2>
@@ -80,11 +81,7 @@
     </FooterTemplate>
 </Modal>
 
-<button class="btn btn-primary" @onclick="CreateFlower">Добавить цветок</button>
-
-<button class="btn btn-primary" @onclick="CreateToy" style="margin-top: 10px;">Добавить Упаковку</button>
-
-<button class="btn btn-primary" @onclick="CreatePack" style="margin-top: 10px;">Добавить Игрушку</button>
+<button class="btn btn-primary" @onclick="CreateFlower">Добавить</button>
 
 <QuickGrid Items="@_userContext.Users" Style="margin-top: 10px;">
     <PropertyColumn Property="@(user => user.Email)" Sortable="true"/>
@@ -149,7 +146,8 @@
         {
             // todo проверка на Null and empty string 
             selectedEntity.Name = _name;
-            selectedEntity.Image = _image;
+            if (!string.IsNullOrEmpty(_image))
+                selectedEntity.Image = _image;
             selectedEntity.Price = _price;
 
             if (selectedEntity.GetType() == typeof(Flower))
@@ -182,17 +180,7 @@
     {
         await addModel.ShowAsync();
     }
-    
-    private async void CreatePack(MouseEventArgs obj)
-    {
-        await addModel.ShowAsync();
-    }
-    
-    private async void CreateToy(MouseEventArgs obj)
-    {
-        await addModel.ShowAsync();
-    }
-
+   
     private async Task AddModel()
     {
         await Task.Run(() =>
@@ -267,12 +255,10 @@
 
     private async Task ChangeBalance()
     {
-        await Task.Run(() =>
-        {
-            selectedUser.Balance = _balance;
-            _userContext.Users.Update(selectedUser);
-            _context.SaveChangesAsync();
-        });
+        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == selectedUser.Id);
+        findUser.Balance = _balance;
+        _userContext.Users.Update(findUser);
+        await _context.SaveChangesAsync();
         await userModal.HideAsync();
     }
 

@@ -24,6 +24,12 @@
 
                             <InputText @bind-Value="ViewModel.Password" class="form-control" autocomplete="password" type="password" aria-required="true" placeholder="Пароль"  style="margin-top: 10px;"/>
 
+                            <select @bind="_city">
+                                <option>-</option>
+                                <option value="Москва">Москва</option>
+                                <option value="Санкт-Питербург">Санкт-Питербург</option>
+                            </select>
+
                             <div class="d-grid mb-2" style="margin-top: 10px;">
                                 <button Variant="Variant.Filled" class="btn btn-primary" Color="Color.Primary" type="submit">Зарегистрироваться</button>
                             </div>
@@ -43,6 +49,8 @@
     private UserViewModel ViewModel { get; set; } = new();
 
     private string Message;
+
+    private string _city;
     
     private void Submit()
     {
@@ -55,11 +63,12 @@
         
         User user = new()
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid(),
             FirstName = ViewModel.FirstName,
             LastName = ViewModel.LastName,
             Email = ViewModel.Email,
             UserName = ViewModel.Email,
+            City = _city
         };
         
         using (SHA256 sha = SHA256.Create())

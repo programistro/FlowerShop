@@ -4,5 +4,5 @@ namespace FlowerShop.Service;
 
 public class UserService
 {
-    public string UserId { get; set; }
+    public Guid UserId { get; set; }
 }

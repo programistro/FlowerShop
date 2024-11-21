@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FlowerShop.Data;
 
-public class UserDbContext : IdentityDbContext<User>
+public class UserDbContext : DbContext
 {
     public DbSet<User> Users => Set<User>();
     

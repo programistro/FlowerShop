@@ -8,6 +8,8 @@
 @using FlowerShop.Data
 @using FlowerShop.Service
 
+<Button Color="ButtonColor.Primary" Type="ButtonType.Button" @onclick="@ShowModel">Показать корзину</Button>
+
 <div class="container mt-4">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
         @foreach (var item in _context.Flowers)
@@ -30,7 +32,7 @@
                     <CardTitle>@item.Name</CardTitle>
                     <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
                     @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
-                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddFlowerCart(item.Id))">Добавить в корзину</Button>
+                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddToyCart(item.Id))">Добавить в корзину</Button>
                 </CardBody>
             </Card>
         }
@@ -42,25 +44,57 @@
                     <CardTitle>@item.Name</CardTitle>
                     <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
                     @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
-                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddFlowerCart(item.Id))">Добавить в корзину</Button>
+                    <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddPackCart(item.Id))">Добавить в корзину</Button>
                 </CardBody>
             </Card>
         }
     </div>
 </div>
 
-<Modal @ref="cartModal" title="Корзина" UseStaticBackdrop="true" CloseOnEscape="true">
+<Modal @ref="cartModal" title="Корзина" UseStaticBackdrop="true" CloseOnEscape="true">               
+    <HeaderTemplate>
+        <h5>@fullPrice</h5>
+    </HeaderTemplate>
     <BodyTemplate>
         @foreach (var item in _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopFlowers)
         {
             var flower = _context.Flowers.FirstOrDefault(x => x.Id == item);
+            if (flower == null)
+            {
+                continue;
+            }
             <div style="display: flex;">
                 <p>@flower.Name @flower.Price рублей</p>
                 <button class="btn btn-primary" style="margin-left: 10px;" @onclick="@(() => RemoveFlower(flower.Id))">Удалить</button>
             </div>
         }
+        @foreach (var item in _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopFlowers)
+        {
+            var pack = _context.Packs.FirstOrDefault(x => x.Id == item);
+            if (pack == null)
+            {
+                continue;
+            }
+            <div style="display: flex;">
+                <p>@pack.Name @pack.Price рублей</p>
+                <button class="btn btn-primary" style="margin-left: 10px;" @onclick="@(() => RemoveToy(pack.Id))">Удалить</button>
+            </div>
+        }
+        @foreach (var item in _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopToys)
+        {
+            var toy = _context.Toys.FirstOrDefault(x => x.Id == item);
+            if (toy == null)
+            {
+                continue;
+            }
+            <div style="display: flex;">
+                <p>@toy.Name @toy.Price рублей</p>
+                <button class="btn btn-primary" style="margin-left: 10px;" @onclick="@(() => RemoveToy(toy.Id))">Удалить</button>
+            </div>
+        }
     </BodyTemplate>
     <FooterTemplate>
+        <p>Общая стоимость @fullPrice</p>
         <Button Color="ButtonColor.Secondary" @onclick="BuyFlower">Купить</Button>
     </FooterTemplate>
 </Modal>
@@ -78,19 +112,49 @@
     {
         if (ShowCard == true)
         {
-            foreach (var item in _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopFlowers)
-            {
-                var flower = _context.Flowers.FirstOrDefault(x => x.Id == item);
-
-                if (flower != null)
-                {
-                    fullPrice += flower.Price;
-                }
-            }
-            
+            fullPrice = CalculatePrice();
             await cartModal.ShowAsync();
             ShowCard = false;
         }
+    }
+
+    private double CalculatePrice()
+    {
+        double price = 0;
+        
+        var user = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
+            
+        foreach (var item in user.ShopFlowers)
+        {
+            var flower = _context.Flowers.FirstOrDefault(x => x.Id == item);
+
+            if (flower != null)
+            {
+                price += flower.Price;
+            }
+        }
+
+        foreach (var item in user.ShopPacks)
+        {
+            var pack = _context.Packs.FirstOrDefault(x => x.Id == item);
+
+            if (pack != null)
+            {
+                price += pack.Price;
+            }
+        }
+            
+        foreach (var item in user.ShopToys)
+        {
+            var toy = _context.Toys.FirstOrDefault(x => x.Id == item);
+
+            if (toy != null)
+            {
+                price += toy.Price;
+            }
+        }
+
+        return price;
     }
 
     private void AddFlowerCart(Guid flower)
@@ -98,6 +162,24 @@
         var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
         
         findUser.ShopFlowers.Add(flower);
+        _userContext.Users.Update(findUser);
+        _userContext.SaveChanges();
+    }
+
+    private void AddToyCart(Guid toy)
+    {
+        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
+        
+        findUser.ShopToys.Add(toy);
+        _userContext.Users.Update(findUser);
+        _userContext.SaveChanges();
+    }
+    
+    private void AddPackCart(Guid pack)
+    {
+        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
+        
+        findUser.ShopPacks.Add(pack);
         _userContext.Users.Update(findUser);
         _userContext.SaveChanges();
     }
@@ -128,5 +210,30 @@
         findUser.ShopFlowers.Remove(flower);
         _userContext.Users.Update(findUser);
         _userContext.SaveChanges();
+    }
+
+    private void RemoveToy(Guid toy)
+    {
+        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
+        
+        findUser.ShopToys.Remove(toy);
+        _userContext.Users.Update(findUser);
+        _userContext.SaveChanges();
+    }
+
+    private void RemovePack(Guid pack)
+    {
+        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
+        
+        findUser.ShopPacks.Remove(pack);
+        _userContext.Users.Update(findUser);
+        _userContext.SaveChanges();
+    }
+
+    private async void ShowModel()
+    {
+        fullPrice = CalculatePrice();
+        
+        await cartModal.ShowAsync();
     }
 }
