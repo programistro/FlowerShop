@@ -2,7 +2,7 @@
 
 namespace FlowerShop.Core;
 
-public interface IEntity
+public class IEntity
 {
     [Key]
     public Guid Id { get; set; }

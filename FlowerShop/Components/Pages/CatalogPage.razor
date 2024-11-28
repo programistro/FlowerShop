@@ -94,8 +94,9 @@
         }
     </BodyTemplate>
     <FooterTemplate>
-        <p>Общая стоимость @fullPrice</p>
-        <Button Color="ButtonColor.Secondary" @onclick="BuyFlower">Купить</Button>
+        <p>@message</p>
+        <p style="margin-left: 5px;">Общая стоимость @fullPrice</p>
+        <Button Color="ButtonColor.Secondary" @onclick="Buy">Купить</Button>
     </FooterTemplate>
 </Modal>
 
@@ -103,6 +104,8 @@
     [Parameter]
     [SupplyParameterFromQuery]
     public bool? ShowCard { get; set; } = false;
+
+    private string message;
 
     private double fullPrice;
     
@@ -184,7 +187,7 @@
         _userContext.SaveChanges();
     }
 
-    private async void BuyFlower()
+    private async void Buy()
     {
         var findUser = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
         
@@ -192,11 +195,43 @@
 
         foreach (var item in findUser.ShopFlowers)
         {
-            amount += _context.Flowers.FirstOrDefault(x => x.Id == item).Price;
+            var product = _context.Flowers.FirstOrDefault(x => x.Id == item);
+
+            if (product == null)
+                continue;
+            
+            amount += product.Price;
+        }
+        foreach (var item in findUser.ShopPacks)
+        {
+            var product = _context.Packs.FirstOrDefault(x => x.Id == item);
+
+            if (product == null)
+                continue;
+            
+            amount += product.Price;
+        }
+        foreach (var item in findUser.ShopToys)
+        {
+            var product = _context.Toys.FirstOrDefault(x => x.Id == item);
+
+            if (product == null)
+                continue;
+            
+            amount += product.Price;
         }
 
+        if (findUser.Balance < amount)
+        {
+            message = "Не достаточно средств для покупки";
+            
+            return;
+        }
+        
         findUser.Balance -= amount;
         findUser.ShopFlowers.Clear();
+        findUser.ShopPacks.Clear();
+        findUser.ShopToys.Clear();
         _userContext.Users.Update(findUser);
         _userContext.SaveChanges();
 

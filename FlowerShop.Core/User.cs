@@ -12,6 +12,8 @@ public class User
     
     public string? Role { get; set; }
     
+    public string? Image { get; set; }
+    
     public string UserName { get; set; }
     
     public string City { get; set; }
@@ -19,6 +21,8 @@ public class User
     public string PasswordHash { get; set; }
     
     public string FirstName { get; set; }
+
+    public List<IEntity>? BuyProducts { get; set; } = new();
 
     public double Balance { get; set; }
     

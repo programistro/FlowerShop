@@ -252,10 +252,10 @@
 
     private async Task ChangeBalance()
     {
-        var findUser = _userContext.Users.FirstOrDefault(x => x.Id == selectedUser.Id);
+        var findUser = await _userContext.Users.FirstOrDefaultAsync(x => x.Id == selectedUser.Id);
         findUser.Balance = _balance;
         _userContext.Users.Update(findUser);
-        await _context.SaveChangesAsync();
+        await _userContext.SaveChangesAsync();
         await userModal.HideAsync();
     }
 

@@ -1,0 +1,94 @@
+﻿@using System.Drawing
+@using FlowerShop.Core
+@using FlowerShop.Data
+@using FlowerShop.Models
+@using FlowerShop.Service
+@inject UserService UserService
+@inject UserDbContext _userContext
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@attribute [Authorize]
+@page "/userPage"
+
+<div class="container">
+	<div class="row gutters">
+		<div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+			<div class="card h-100">
+				<div class="card-body">
+					<div class="account-settings">
+						<div class="user-profile">
+							<div class="user-avatar">
+								<img src="https://bootdey.com/img/Content/avatar/avatar7.png" width="240px" alt="Maxwell Admin">
+							</div>
+							<h5 class="user-name" style="justify-self: center; text-align: center">@_model.FirstName @_model.LastName</h5>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+			<div class="card h-63">
+				<div class="card-body">
+					<div class="row gutters">
+						<div class="col-xl-11 col-lg-12 col-md-12 col-sm-12 col-12">
+							<h6 class="mb-2 text-primary">Данные о пользователе</h6>
+						</div>
+						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Почта</label>
+								<input class="form-control" disabled="disabled" placeholder="@_model.Email">
+							</div>
+						</div>
+
+						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Имя</label>
+								<input class="form-control" disabled="disabled" placeholder="@_model.FirstName">
+							</div>
+						</div>
+
+						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Фамилия</label>
+								<input class="form-control" disabled="disabled" placeholder="@_model.LastName">
+							</div>
+						</div>
+
+						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Права</label>
+								<input class="form-control" disabled="disabled" placeholder="@_model.Role">
+							</div>
+						</div>
+					</div>
+					<div class="row gutters">
+						<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-right" style="text-align: end;">
+							<button class="btn btn-primary" style="margin-top: 8px;" @onclick="Signout">Выйти</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private User _user;
+
+	private UserModel _model = new();
+	
+	protected override void OnInitialized()
+	{
+		_user = _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId);
+
+		_model.Email = _user.Email;
+		_model.Role = _user.Role;
+		_model.FirstName = _user.FirstName;
+		_model.LastName = _user.LastName;
+	}
+
+	private void Signout()
+	{
+		NavigationManager.NavigateTo("Auth/signout", true);
+	}
+}

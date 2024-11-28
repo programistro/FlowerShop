@@ -28,6 +28,7 @@
                         <DataAnnotationsValidator/>
                         <ValidationSummary/>
                     </EditForm>
+                    <p>@message</p>
                 </div>
             </div>
         </section>
@@ -36,6 +37,8 @@
 
 @code {
     private LoginViewModel ViewModel { get; set; } = new();
+
+    private string message;
 
     private void Submit()
     {
@@ -53,17 +56,25 @@
 
             var findUser = _context.Users.FirstOrDefault(x => x.Email == ViewModel.Email);
 
+            if (findUser == null)
+            {
+                message = "Не найден пользователь с такой почтой";
+                return;
+            }
+            
             if (ViewModel.Email == "admin@gmail.com")
             {
                 NavigationManager.NavigateTo($"auth/singin?email={findUser.Email}&role=admin", true);
             }
             
-            if (findUser != null)
+            if (findUser.PasswordHash == hash)
             {
-                if (findUser.PasswordHash == hash)
-                {
-                    NavigationManager.NavigateTo($"auth/singin?email={findUser.Email}&role=user", true);
-                }
+                NavigationManager.NavigateTo($"auth/singin?email={findUser.Email}&role=user", true);
+            }
+            else
+            {
+                message = "Не верный пароль";
+                return;
             }
         }
     }

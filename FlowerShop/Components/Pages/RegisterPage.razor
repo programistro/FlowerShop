@@ -68,7 +68,8 @@
             LastName = ViewModel.LastName,
             Email = ViewModel.Email,
             UserName = ViewModel.Email,
-            City = _city
+            City = _city,
+            Role = "user"
         };
         
         using (SHA256 sha = SHA256.Create())
@@ -91,6 +92,9 @@
         
         if (user.Email == "admin@gmail.com")
         {
+            user.Role = "admin";
+            _context.Update(user);
+            _context.SaveChanges();
             NavigationManager.NavigateTo($"auth/singin?email={user.Email}&role=admin", true);
         }
         else
