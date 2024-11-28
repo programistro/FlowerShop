@@ -11,11 +11,10 @@
 
 <h2>Цветы</h2>
 <QuickGrid Items="@_context.Flowers">
-    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true"/>
-    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true"/>
+    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true" Title="Название"/>
+    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true" Title="Цена"/>
     <TemplateColumn Title="Изменить">
         <button class="btn btn-primary" @onclick="@(() => ChangeModel(context))">Изменить</button>
-        
     </TemplateColumn>
     <TemplateColumn Title="Удалить">
         <button class="btn btn-primary" @onclick="@(() => DeleteModel(context))">Удалить</button>
@@ -24,11 +23,10 @@
 
 <h2>Упаковки</h2>
 <QuickGrid Items="@_context.Packs">
-    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true"/>
-    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true"/>
+    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true" Title="Название"/>
+    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true" Title="Цена"/>
     <TemplateColumn Title="Изменить">
         <button class="btn btn-primary" @onclick="@(() => ChangeModel(context))">Изменить</button>
-
     </TemplateColumn>
     <TemplateColumn Title="Удалить">
         <button class="btn btn-primary" @onclick="@(() => DeleteModel(context))">Удалить</button>
@@ -37,11 +35,10 @@
 
 <h2>Игрушки</h2>
 <QuickGrid Items="@_context.Toys">
-    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true"/>
-    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true"/>
+    <PropertyColumn Property="@(flower => flower.Name)" Sortable="true" Title="Название"/>
+    <PropertyColumn Property="@(flower => flower.Price)" Sortable="true" Title="Цена"/>
     <TemplateColumn Title="Изменить">
         <button class="btn btn-primary" @onclick="@(() => ChangeModel(context))">Изменить</button>
-
     </TemplateColumn>
     <TemplateColumn Title="Удалить">
         <button class="btn btn-primary" @onclick="@(() => DeleteModel(context))">Удалить</button>
@@ -84,10 +81,10 @@
 <button class="btn btn-primary" @onclick="CreateFlower">Добавить</button>
 
 <QuickGrid Items="@_userContext.Users" Style="margin-top: 10px;">
-    <PropertyColumn Property="@(user => user.Email)" Sortable="true"/>
-    <PropertyColumn Property="@(user => user.Balance)" Sortable="true"/>
-    <PropertyColumn Property="@(user => user.FirstName)" Sortable="true"/>
-    <PropertyColumn Property="@(user => user.LastName)" Sortable="true"/>
+    <PropertyColumn Property="@(user => user.Email)" Sortable="true" Title="Почта"/>
+    <PropertyColumn Property="@(user => user.Balance)" Sortable="true" Title="Баланс"/>
+    <PropertyColumn Property="@(user => user.FirstName)" Sortable="true" Title="Имя"/>
+    <PropertyColumn Property="@(user => user.LastName)" Sortable="true" Title="Фамилия"/>
     <TemplateColumn Title="Добавить баланс">
         <button class="btn btn-primary" @onclick="@(() => ShowChangeBalance(context))">Изменить</button>
     </TemplateColumn>
