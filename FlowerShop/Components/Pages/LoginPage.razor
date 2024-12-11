@@ -64,7 +64,12 @@
             
             if (ViewModel.Email == "admin@gmail.com")
             {
-                NavigationManager.NavigateTo($"auth/singin?email={findUser.Email}&role=admin", true);
+                if (findUser.PasswordHash == hash)
+                {
+                    NavigationManager.NavigateTo($"auth/singin?email={findUser.Email}&role=admin", true);
+                    
+                    return;
+                }
             }
             
             if (findUser.PasswordHash == hash)

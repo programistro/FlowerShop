@@ -2,10 +2,13 @@
 @rendermode InteractiveServer
 @inject AppDbContext _context
 @inject UserDbContext _userContext
+@inject NavigationManager NavigationManager
 @using BlazorBootstrap
+@using ClosedXML.Excel
 @using FlowerShop.Core
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using FlowerShop.Data
+@using Microsoft.AspNetCore.Mvc
 @using Microsoft.EntityFrameworkCore
 @page "/admin"
 
@@ -99,6 +102,10 @@
         <Button Color="ButtonColor.Secondary" @onclick="ChangeBalance">Изменить</Button>
     </FooterTemplate>
 </Modal>
+
+<button class="btn btn-primary" @onclick="ExportFlowers">Экспорт цветов в excel таблицу</button>
+<button class="btn btn-primary" @onclick="ExportToys">Экспорт игрушек в excel таблицу</button>
+<button class="btn btn-primary" @onclick="ExportPacks">Экспорт упаковок в excel таблицу</button>
 
 @code {
     protected IQueryable<Flower>? itemsQueryable;
@@ -264,5 +271,20 @@
         selectedUser = user;
 
         await userModal.ShowAsync();
+    }
+
+    private void ExportFlowers()
+    {
+        NavigationManager.NavigateTo("Api/export-flowers");
+    }
+    
+    private void ExportPacks()
+    {
+        NavigationManager.NavigateTo("Api/export-packs");
+    }
+    
+    private void ExportToys()
+    {
+        NavigationManager.NavigateTo("Api/export-toys");
     }
 }
