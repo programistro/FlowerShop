@@ -107,6 +107,10 @@
 <button class="btn btn-primary" @onclick="ExportToys">Экспорт игрушек в excel таблицу</button>
 <button class="btn btn-primary" @onclick="ExportPacks">Экспорт упаковок в excel таблицу</button>
 
+<InputFile OnChange="@HandleFileInputFlower" accept=".xlsx" >Загрузить цветок</InputFile>
+<InputFile OnChange="@HandleFileInputPack" accept=".xlsx" >Загрузить упаковку</InputFile>
+<InputFile OnChange="@HandleFileInputToy" accept=".xlsx" >Загрузить игрушку</InputFile>
+
 @code {
     protected IQueryable<Flower>? itemsQueryable;
 
@@ -286,5 +290,98 @@
     private void ExportToys()
     {
         NavigationManager.NavigateTo("Api/export-toys");
+    }
+    
+    private IBrowserFile _file;
+    private string _message;
+
+    private async Task HandleFileInputFlower(InputFileChangeEventArgs e)
+    {
+        _file = e.File;
+        _message = "";
+        
+        using var stream = new MemoryStream();
+        await _file.OpenReadStream().CopyToAsync(stream);
+        stream.Position = 0;
+
+        using var workbook = new XLWorkbook(stream);
+        var worksheet = workbook.Worksheets.First();
+
+        foreach (var row in worksheet.RowsUsed().Skip(1)) // Пропускаем заголовок
+        {
+            var data = new Flower()
+            {
+                Id = Guid.NewGuid(), 
+                Name = row.Cell(1).Value.ToString(), 
+                Image= row.Cell(2).Value.ToString(),
+                Price = (double)row.Cell(3).Value
+            };
+
+            _context.Flowers.Add(data);
+        }
+
+        await _context.SaveChangesAsync();
+
+        _message = "Файл успешно импортирован!";
+    }
+    
+    private async Task HandleFileInputPack(InputFileChangeEventArgs e)
+    {
+        _file = e.File;
+        _message = "";
+        
+        using var stream = new MemoryStream();
+        await _file.OpenReadStream().CopyToAsync(stream);
+        stream.Position = 0;
+
+        using var workbook = new XLWorkbook(stream);
+        var worksheet = workbook.Worksheets.First();
+
+        foreach (var row in worksheet.RowsUsed().Skip(1)) // Пропускаем заголовок
+        {
+            var data = new Pack()
+            {
+                Id = Guid.NewGuid(), 
+                Name = row.Cell(1).Value.ToString(), 
+                Image= row.Cell(2).Value.ToString(),
+                Price = (double)row.Cell(3).Value
+            };
+
+            _context.Packs.Add(data);
+        }
+
+        await _context.SaveChangesAsync();
+
+        _message = "Файл успешно импортирован!";
+    }
+    
+    private async Task HandleFileInputToy(InputFileChangeEventArgs e)
+    {
+        _file = e.File;
+        _message = "";
+        
+        using var stream = new MemoryStream();
+        await _file.OpenReadStream().CopyToAsync(stream);
+        stream.Position = 0;
+
+        using var workbook = new XLWorkbook(stream);
+        var worksheet = workbook.Worksheets.First();
+
+        foreach (var row in worksheet.RowsUsed().Skip(1)) // Пропускаем заголовок
+        {
+            var data = new Toy()
+            {
+                Id = Guid.NewGuid(), 
+                Name = row.Cell(1).Value.ToString(), 
+                Image= row.Cell(2).Value.ToString(),
+                Price = (double)row.Cell(3).Value
+            };
+
+            _context.Toys.Add(data);
+        }
+
+        await _context.SaveChangesAsync();
+
+        _message = "Файл успешно импортирован!";
     }
 }
