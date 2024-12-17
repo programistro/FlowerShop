@@ -107,9 +107,11 @@
 <button class="btn btn-primary" @onclick="ExportToys">Экспорт игрушек в excel таблицу</button>
 <button class="btn btn-primary" @onclick="ExportPacks">Экспорт упаковок в excel таблицу</button>
 
-<InputFile OnChange="@HandleFileInputFlower" accept=".xlsx" >Загрузить цветок</InputFile>
-<InputFile OnChange="@HandleFileInputPack" accept=".xlsx" >Загрузить упаковку</InputFile>
-<InputFile OnChange="@HandleFileInputToy" accept=".xlsx" >Загрузить игрушку</InputFile>
+<div style="flex: revert; margin-top: 10px;">
+    <InputFile OnChange="@HandleFileInputFlower" class="input-file" accept=".xlsx" >Загрузить цветок</InputFile>
+    <InputFile OnChange="@HandleFileInputPack" class="input-file" accept=".xlsx" >Загрузить упаковку</InputFile>
+    <InputFile OnChange="@HandleFileInputToy" class="input-file" accept=".xlsx" >Загрузить игрушку</InputFile>
+</div>
 
 @code {
     protected IQueryable<Flower>? itemsQueryable;
