@@ -37,7 +37,7 @@
                         <CardTitle>@item.Name</CardTitle>
                         <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
                         @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
-                        <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddToyCart(item.Id))">Добавить в корзину</Button>
+                        <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddPackCart(item.Id))">Добавить в корзину</Button>
                     </CardBody>
                 </Card>
             }
@@ -53,7 +53,7 @@
                         <CardTitle>@item.Name</CardTitle>
                         <CardSubTitle Class="mb-2 text-muted">@item.Price рублей</CardSubTitle>
                         @* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> *@
-                        <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddPackCart(item.Id))">Добавить в корзину</Button>
+                        <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Button" @onclick="@(e => AddToyCart(item.Id))">Добавить в корзину</Button>
                     </CardBody>
                 </Card>
             }
