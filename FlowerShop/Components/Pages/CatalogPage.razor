@@ -29,7 +29,7 @@
     </AccordionItem>
     <AccordionItem Title="Упаковки">
         <Content>
-            @foreach (var item in _context.Toys)
+            @foreach (var item in _context.Packs)
             {
                 <Card Class="mb-4" Style="width:18rem; margin-left: 5px;">
                     <img class="rounded-top" src="data:image/png;base64, @item.Image" alt="placeholder"/>
@@ -45,7 +45,7 @@
     </AccordionItem>
     <AccordionItem Title="Игрушки">
         <Content>
-            @foreach (var item in _context.Packs)
+            @foreach (var item in _context.Toys)
             {
                 <Card Class="mb-4" Style="width:18rem; margin-left: 5px;">
                     <img class="rounded-top" src="data:image/png;base64, @item.Image" alt="placeholder"/>
