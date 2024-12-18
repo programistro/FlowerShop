@@ -86,15 +86,24 @@
     <BodyTemplate>
         @if (_userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopToys.Count >= 1)
         {
-            <NumberInput TValue="int?" @bind-Value="quantityToys" Step="1" Placeholder="Введите количетсво игрушек"/>
+            <div>
+                <p>Введите количетсво игрушек</p>
+                <NumberInput TValue="int?" @bind-Value="quantityToys" Step="1" Placeholder="Введите количетсво игрушек"/>
+            </div>
         }
         @if (_userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopPacks.Count >= 1)
         {
-            <NumberInput TValue="int?" @bind-Value="quantityPacks" Step="1" Placeholder="Введите количетсво упаковок"/>
+            <div style="margin-top: 10px;">
+                <p>Введите количетсво упаковок</p>
+                <NumberInput TValue="int?" @bind-Value="quantityPacks" Step="1" Placeholder="Введите количетсво упаковок"/>
+            </div>
         }
         @if (_userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopFlowers.Count >= 1)
         {
-            <NumberInput TValue="int?" @bind-Value="quantityFlower" Step="1" Placeholder="Введите количетсво цветов"/>
+            <div style="margin-top: 10px;">
+                <p>Введите количетсво цветов</p>
+                <NumberInput TValue="int?" @bind-Value="quantityFlower" Step="1" Placeholder="Введите количетсво цветов"/>
+            </div>
         }
         @foreach (var item in _userContext.Users.FirstOrDefault(x => x.Id == UserService.UserId).ShopFlowers)
         {

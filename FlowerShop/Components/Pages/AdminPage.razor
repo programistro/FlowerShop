@@ -10,6 +10,7 @@
 @using FlowerShop.Data
 @using Microsoft.AspNetCore.Mvc
 @using Microsoft.EntityFrameworkCore
+@using SQLitePCL
 @page "/admin"
 
 <h2>Цветы</h2>
@@ -154,23 +155,32 @@
     {
         await Task.Run(() =>
         {
-            // todo проверка на Null and empty string 
-            selectedEntity.Name = _name;
-            if (!string.IsNullOrEmpty(_image))
-                selectedEntity.Image = _image;
-            selectedEntity.Price = _price;
-
             if (selectedEntity.GetType() == typeof(Flower))
             {
-                _context.Flowers.Update(selectedEntity as Flower);
+                var flower = selectedEntity as Flower;
+                flower.Name = _name;
+                flower.Price = _price;
+                if (!string.IsNullOrEmpty(_image))
+                    flower.Image = _image;
+                _context.Flowers.Update(flower);
             }
             else if (selectedEntity.GetType() == typeof(Toy))
             {
-                _context.Toys.Update(selectedEntity as Toy);
+                var toy = selectedEntity as Toy;
+                toy.Name = _name;
+                toy.Price = _price;
+                if (!string.IsNullOrEmpty(_image))
+                    toy.Image = _image;
+                _context.Toys.Update(toy);
             }
             else if (selectedEntity.GetType() == typeof(Pack))
             {
-                _context.Packs.Update(selectedEntity as Pack);
+                var pack = selectedEntity as Pack;
+                pack.Price = _price;
+                pack.Name = _name;
+                if (!string.IsNullOrEmpty(_image))
+                    pack.Image = _image;
+                _context.Packs.Update(pack);
             }
             
             _context.SaveChangesAsync();

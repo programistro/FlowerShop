@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlowerShop.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20241128180650_Initial")]
+    [Migration("20241218153543_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
